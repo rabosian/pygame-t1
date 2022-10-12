@@ -1,6 +1,7 @@
 import pygame
 import os
 pygame.font.init()
+pygame.mixer.init()
 
 # SCREEN
 WIDTH, HEIGHT = 900, 500
@@ -22,6 +23,8 @@ FPS = 60
 # BULLET
 BULLET_VEL = 7
 MAX_BULLETS = 3  # max bullets on the screen
+BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join('Assets', 'Grenade+1.mp3'))
+BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join('Assets', 'Gun+Silencer.mp3'))
 
 # USER EVENT 1,2
 YELLOW_HIT = pygame.USEREVENT + 1
@@ -94,6 +97,7 @@ def handle_bullets(yellow_bullets, red_bullets, yellow, red):
         bullet.x += BULLET_VEL
         if red.colliderect(bullet): # hit red
             pygame.event.post(pygame.event.Event(RED_HIT))
+            BULLET_HIT_SOUND.play()
             yellow_bullets.remove(bullet)
         if bullet.x > WIDTH:
             yellow_bullets.remove(bullet)
@@ -102,6 +106,7 @@ def handle_bullets(yellow_bullets, red_bullets, yellow, red):
         bullet.x -= BULLET_VEL
         if yellow.colliderect(bullet): # hit yellow
             pygame.event.post(pygame.event.Event(YELLOW_HIT))
+            BULLET_HIT_SOUND.play()
             red_bullets.remove(bullet)
         if bullet.x < 0:
             red_bullets.remove(bullet)
@@ -139,12 +144,14 @@ def main():
                     bullet = pygame.Rect(
                         yellow.x + yellow.height, yellow.y + yellow.width/2 - 2, 10, 5)
                     yellow_bullets.append(bullet)
+                    BULLET_FIRE_SOUND.play()
 
                 if event.key == pygame.K_RCTRL and len(red_bullets) < MAX_BULLETS:
                     bullet = pygame.Rect(
                         red.x, red.y + red.width/2 - 2, 10, 5)
                     red_bullets.append(bullet)
-                
+                    BULLET_FIRE_SOUND.play()
+
             if event.type == RED_HIT:
                 red_health -= 1
             if event.type == YELLOW_HIT:
